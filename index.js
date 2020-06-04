@@ -5,15 +5,12 @@ const ReadStream = require('./iterator-stream')
 const queueMicrotask = require('queue-microtask')
 
 if (typeof window !== 'undefined') {
-  process.nextTick = function (fn) {
-    var args = new Array(arguments.length - 1)
-    if (arguments.length > 1) {
-      for (var i = 1; i < arguments.length; i++) {
-        args[i - 1] = arguments[i]
-      }
+  process.nextTick = (...args) => {
+    if (args.length === 1) {
+      return queueMicrotask(args[0])
     }
 
-    queueMicrotask(() => fn(...args))
+    queueMicrotask(() => args[0](...args.slice(1, args.length)))
   }
 }
 
