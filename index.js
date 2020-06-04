@@ -2,6 +2,20 @@ const { Suite } = require('@dxos/benchmark-suite')
 const level = require('level')
 const levelmem = require('level-mem')
 const ReadStream = require('./iterator-stream')
+const queueMicrotask = require('queue-microtask')
+
+if (typeof window !== 'undefined') {
+  process.nextTick = function (fn) {
+    var args = new Array(arguments.length - 1)
+    if (arguments.length > 1) {
+      for (var i = 1; i < arguments.length; i++) {
+        args[i - 1] = arguments[i]
+      }
+    }
+
+    queueMicrotask(() => fn(...args))
+  }
+}
 
 ;(async () => {
   const suite = new Suite()
