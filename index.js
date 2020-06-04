@@ -16,6 +16,12 @@ const level = require('level-mem')
     await db.batch(op)
   })
 
+  suite.test('read by get', async () => {
+    for (let i = 0; i < n; i++) {
+      await db.get(`key/${i}`)
+    }
+  })
+
   suite.test('createReadStream', async () => {
     let i = 0
     const stream = db.createReadStream()
