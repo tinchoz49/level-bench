@@ -23,7 +23,9 @@ const levelmem = require('level-mem')
 
   suite.test('level: read by get', async () => {
     for (let i = 0; i < n; i++) {
-      await db.get(`key/${i}`)
+      if (await db.get(`key/${i}`) !== `value/${i}`) {
+        throw new Error('wrong get')
+      }
     }
   })
 
@@ -37,7 +39,9 @@ const levelmem = require('level-mem')
 
   suite.test('level-mem: read by get', async () => {
     for (let i = 0; i < n; i++) {
-      await dbmem.get(`key/${i}`)
+      if (await dbmem.get(`key/${i}`) !== `value/${i}`) {
+        throw new Error('wrong get')
+      }
     }
   })
 
