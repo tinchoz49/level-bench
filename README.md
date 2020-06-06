@@ -8,6 +8,7 @@ $ cd level-bench
 $ npm install
 $ npm run benchmark:node
 $ npm run benchmark:browser
+$ MICROTASK=1 npm run benchmark:browser
 ```
 
 ## Results
@@ -16,38 +17,57 @@ $ npm run benchmark:browser
 
 ```
 # level: read by get
-ok ~23 ms (0 s + 22597062 ns)
+ok ~18 ms (0 s + 17847146 ns)
 
 # level: createReadStream
-ok ~17 ms (0 s + 16784238 ns)
+ok ~17 ms (0 s + 16594899 ns)
 
 # level-mem: read by get
-ok ~16 ms (0 s + 15990506 ns)
+ok ~17 ms (0 s + 16674587 ns)
 
 # level-mem: createReadStream
-ok ~15 ms (0 s + 14724392 ns)
+ok ~9.37 ms (0 s + 9367946 ns)
 
 wins: level-mem: createReadStream
-ok ~104 ms (0 s + 104342327 ns)
+ok ~103 ms (0 s + 102973869 ns)
 ```
 
 ### Browser
 
 ```
 # level: read by get
-ok ~286 ms (0 s + 286250001 ns)
+ok ~296 ms (0 s + 295730000 ns)
 
 # level: createReadStream
-ok ~4.45 s (4 s + 452095000 ns)
+ok ~4.52 s (4 s + 523419999 ns)
 
 # level-mem: read by get
-ok ~51 ms (0 s + 51350000 ns)
+ok ~402 ms (0 s + 402440000 ns)
 
 # level-mem: createReadStream
-ok ~4.47 s (4 s + 468040000 ns)
+ok ~4.46 s (4 s + 456030000 ns)
 
-wins: level-mem: read by get
-ok ~9.46 s (9 s + 463925000 ns)
+wins: level: read by get
+ok ~9.87 s (9 s + 869610000 ns)
+```
+
+### Browser with nextTick using queueMicrotask
+
+```
+# level: read by get
+ok ~535 ms (0 s + 534795000 ns)
+
+# level: createReadStream
+ok ~91 ms (0 s + 90644999 ns)
+
+# level-mem: read by get
+ok ~327 ms (0 s + 326570000 ns)
+
+# level-mem: createReadStream
+ok ~76 ms (0 s + 75775000 ns)
+
+wins: level-mem: createReadStream
+ok ~1.46 s (1 s + 462025001 ns)
 ```
 
 ### Hardware used

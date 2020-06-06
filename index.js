@@ -1,10 +1,9 @@
 const { Suite } = require('@dxos/benchmark-suite')
 const level = require('level')
 const levelmem = require('level-mem')
-const ReadStream = require('./iterator-stream')
 const queueMicrotask = require('queue-microtask')
 
-if (typeof window !== 'undefined') {
+if (process.env.MICROTASK && typeof window !== 'undefined') {
   process.nextTick = (...args) => {
     if (args.length === 1) {
       return queueMicrotask(args[0])
@@ -33,53 +32,8 @@ if (typeof window !== 'undefined') {
     ])
   })
 
-  suite.test('level: read by get', async () => {
-    for (let i = 0; i < n; i++) {
-      if (await db.get(`key/${i}`) !== `value/${i}`) {
-        throw new Error('wrong get')
-      }
-    }
-  })
-
-  suite.test('level: createReadStream', async () => {
-    let i = 0
-    const stream = db.createReadStream()
-    stream.on('data', () => i++)
-    await new Promise(resolve => stream.on('end', resolve))
-    if (i !== n) throw new Error('missing messages')
-  })
-
-  suite.test('level: createReadStream (-maybeToRead nextTick)', async () => {
-    let i = 0
-    const stream = ReadStream(db.iterator())
-    stream.on('data', () => i++)
-    await new Promise(resolve => stream.on('end', resolve))
-    if (i !== n) throw new Error('missing messages')
-  })
-
-  suite.test('level-mem: read by get', async () => {
-    for (let i = 0; i < n; i++) {
-      if (await dbmem.get(`key/${i}`) !== `value/${i}`) {
-        throw new Error('wrong get')
-      }
-    }
-  })
-
-  suite.test('level-mem: createReadStream', async () => {
-    let i = 0
-    const stream = dbmem.createReadStream()
-    stream.on('data', () => i++)
-    await new Promise(resolve => stream.on('end', resolve))
-    if (i !== n) throw new Error('missing messages')
-  })
-
-  suite.test('level-mem: createReadStream (-maybeToRead nextTick)', async () => {
-    let i = 0
-    const stream = ReadStream(dbmem.iterator())
-    stream.on('data', () => i++)
-    await new Promise(resolve => stream.on('end', resolve))
-    if (i !== n) throw new Error('missing messages')
-  })
+  test(db, suite, 'level', n)
+  test(db, suite, 'level-mem', n)
 
   const result = await suite.run()
 
@@ -87,3 +41,21 @@ if (typeof window !== 'undefined') {
 
   process.exit(0)
 })()
+
+function test (db, suite, title, max) {
+  suite.test(`${title}: read by get`, async () => {
+    for (let i = 0; i < max; i++) {
+      if (await db.get(`key/${i}`) !== `value/${i}`) {
+        throw new Error('wrong get')
+      }
+    }
+  })
+
+  suite.test(`${title}: createReadStream`, async () => {
+    let i = 0
+    const stream = db.createReadStream()
+    stream.on('data', () => i++)
+    await new Promise(resolve => stream.on('end', resolve))
+    if (i !== max) throw new Error('missing messages')
+  })
+}
